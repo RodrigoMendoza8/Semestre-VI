@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source \"/c/Semestre VI/.venv/Scripts/activate\")"
+    ]
+  }
+}
