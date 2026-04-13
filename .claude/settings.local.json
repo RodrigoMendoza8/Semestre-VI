@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(source \"/c/Semestre VI/.venv/Scripts/activate\")"
+      "Bash(source \"/c/Semestre VI/.venv/Scripts/activate\")",
+      "Bash(python -c ':*)"
     ]
   }
 }
