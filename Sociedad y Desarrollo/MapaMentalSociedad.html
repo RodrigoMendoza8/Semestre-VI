@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa Mental — Ojos Bien Cerrados</title>
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Gabarito',sans-serif;background:#FDF9F0;min-height:100vh;}
+.toolbar{position:sticky;top:0;z-index:100;background:rgba(253,249,240,0.92);backdrop-filter:blur(10px);border-bottom:1.5px solid #e8e0d0;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;font-family:'DM Sans',sans-serif;}
+.toolbar-hint{font-size:12px;color:#998;}
+.btn-export{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:#2a2a28;color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:transform .15s,opacity .15s;}
+.btn-export:hover{opacity:.85;transform:translateY(-1px);}
+.btn-export:active{transform:scale(.97);}
+.btn-export.loading{opacity:.5;pointer-events:none;}
+.map-wrap{width:1100px;margin:20px auto 0;}
+.map-container{width:1100px;height:850px;position:relative;}
+.center-node{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);background:#F5C842;border:3.5px solid #D4A520;border-radius:18px;padding:16px 28px;text-align:center;z-index:10;box-shadow:0 4px 24px rgba(212,165,32,0.3);}
+.center-node h1{font-size:22px;font-weight:900;color:#3a2a00;line-height:1.2;}
+.center-node .sub{font-size:11px;color:#6b5200;margin-top:3px;font-family:'DM Sans',sans-serif;font-weight:500;}
+.branch-label{position:absolute;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:0.3px;z-index:12;outline:none;cursor:text;line-height:1.25;text-align:center;}
+.sub-label{position:absolute;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;z-index:8;outline:none;cursor:text;white-space:nowrap;padding:3px 10px;border-radius:20px;border:1.5px solid;}
+.leaf{position:absolute;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;z-index:8;outline:none;cursor:text;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,0.8);border:1px dashed;max-width:170px;white-space:normal;text-align:center;line-height:1.35;}
+svg.branches{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;}
+.icon-dot{position:absolute;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;z-index:11;color:#fff;}
+.sources{width:1100px;margin:0 auto 40px;padding:16px 24px;background:#fff;border:1px solid #e8e0d0;border-radius:10px;font-family:'DM Sans',sans-serif;}
+.sources-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;color:#999;margin-bottom:8px;}
+.sources-list{font-size:10.5px;color:#777;line-height:1.7;columns:2;column-gap:32px;}
+.sources-list span{display:block;break-inside:avoid;margin-bottom:4px;}
+.sources-list a{color:#2573C5;text-decoration:none;word-break:break-all;}
+.sources-list a:hover{text-decoration:underline;}
+@media print{.toolbar{display:none!important;}}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="toolbar-hint">Clic en cualquier texto para editarlo</div>
+  <button class="btn-export" id="exportBtn" onclick="exportPDF()">
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Exportar PDF
+  </button>
+</div>
+
+<div class="map-wrap" id="mapContent">
+<div class="map-container">
+
+  <svg class="branches" viewBox="0 0 1100 850">
+    <path d="M515 372 C435 305,355 245,280 185" stroke="#7B5CF5" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M280 185 C230 158,180 140,120 125" stroke="#7B5CF5" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M280 185 C225 195,170 200,105 202" stroke="#7B5CF5" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M280 185 C265 140,255 100,248 55" stroke="#7B5CF5" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/>
+    <path d="M280 185 C210 178,155 178,85 180" stroke="#7B5CF5" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/>
+
+    <path d="M585 372 C665 305,745 245,820 185" stroke="#E85D30" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M820 185 C875 158,925 140,990 125" stroke="#E85D30" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M820 185 C878 195,935 200,1005 202" stroke="#E85D30" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M820 185 C830 140,835 100,835 55" stroke="#E85D30" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/>
+    <path d="M820 185 C890 178,950 178,1020 180" stroke="#E85D30" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/>
+
+    <path d="M620 398 C720 402,795 406,870 410" stroke="#0F9B6E" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M870 410 C925 388,965 375,1015 362" stroke="#0F9B6E" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M870 410 C930 432,970 445,1020 455" stroke="#0F9B6E" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M870 410 C900 408, 930 405, 965 405" stroke="#0F9B6E" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/>
+
+    <path d="M585 418 C660 490,735 558,800 620" stroke="#D4537E" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M800 620 C855 600,905 588,962 578" stroke="#D4537E" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M800 620 C858 642,908 655,968 662" stroke="#D4537E" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M800 620 C800 668,798 705,795 745" stroke="#D4537E" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/>
+
+    <path d="M515 418 C440 490,365 558,280 620" stroke="#C47A12" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M280 620 C222 600,172 588,108 578" stroke="#C47A12" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M280 620 C218 642,168 655,100 662" stroke="#C47A12" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M280 620 C278 668,278 705,280 745" stroke="#C47A12" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/>
+
+    <path d="M478 398 C378 402,298 406,220 410" stroke="#2573C5" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M220 410 C165 388,125 375,68 362" stroke="#2573C5" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M220 410 C162 432,122 445,62 455" stroke="#2573C5" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M220 410 C195 408, 175 405, 150 405" stroke="#2573C5" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/>
+  </svg>
+
+  <div class="center-node">
+    <h1 contenteditable="true">OJOS BIEN<br>CERRADOS</h1>
+    <div class="sub" contenteditable="true">Kubrick, 1999 &bull; Sociedad y desarrollo</div>
+  </div>
+
+  <div class="icon-dot" style="left:262px;top:167px;background:#7B5CF5;">P</div>
+  <div class="branch-label" style="left:210px;top:211px;width:140px;color:#6B5CE7;" contenteditable="true">PODER DE<br>LAS ÉLITES</div>
+  
+  <div class="sub-label" style="left:15px;top:110px;color:#6B5CE7;background:#EEEDFE;border-color:#CCC8F4;" contenteditable="true">Sociedad secreta de Somerton</div>
+  <div class="sub-label" style="left:5px;top:205px;color:#6B5CE7;background:#EEEDFE;border-color:#CCC8F4;" contenteditable="true">Impunidad: sin consecuencias</div>
+  
+  <div class="leaf" style="left:160px;top:10px;border-color:#B0A8EE;color:#534AB7;" contenteditable="true">Oxfam México (2026): 22 milmillonarios acumulan $3.9 billones de pesos, récord histórico</div>
+  <div class="leaf" style="left:5px;top:145px;border-color:#B0A8EE;color:#534AB7;max-width:145px;" contenteditable="true">Élites operan desde redes informales, fuera del control democrático</div>
+
+  <div class="icon-dot" style="left:802px;top:167px;background:#E85D30;">D</div>
+  <div class="branch-label" style="left:745px;top:211px;width:155px;color:#E85D30;" contenteditable="true">DESIGUALDAD<br>ESTRUCTURAL</div>
+
+  <div class="sub-label" style="left:920px;top:110px;color:#D85A30;background:#FAECE7;border-color:#F0997B;" contenteditable="true">"Dos mundos" en la película</div>
+  <div class="sub-label" style="left:930px;top:205px;color:#D85A30;background:#FAECE7;border-color:#F0997B;" contenteditable="true">Brecha insalvable de clases</div>
+  
+  <div class="leaf" style="left:750px;top:10px;border-color:#F0997B;color:#993C1D;" contenteditable="true">Informe Desigualdad 2026 (World Inequality Lab): el 10% más rico capta 53% del ingreso global</div>
+  <div class="leaf" style="left:935px;top:145px;border-color:#F0997B;color:#993C1D;" contenteditable="true">La mitad más pobre posee solo el 2% de la riqueza mundial</div>
+
+  <div class="icon-dot" style="left:852px;top:392px;background:#0F9B6E;">M</div>
+  <div class="branch-label" style="left:812px;top:435px;width:120px;color:#0F9B6E;" contenteditable="true">MÁSCARAS<br>SOCIALES</div>
+
+  <div class="sub-label" style="left:955px;top:345px;color:#0F9B6E;background:#E1F5EE;border-color:#5DCAA5;" contenteditable="true">Fachadas y doble vida</div>
+  <div class="sub-label" style="left:955px;top:450px;color:#0F9B6E;background:#E1F5EE;border-color:#5DCAA5;" contenteditable="true">Anonimato = impunidad</div>
+  <div class="leaf" style="left:955px;top:385px;border-color:#5DCAA5;color:#085041;max-width:130px;" contenteditable="true">Perú 2026: redes sociales manipulan opinión pública</div>
+
+  <div class="icon-dot" style="left:782px;top:602px;background:#D4537E;">C</div>
+  <div class="branch-label" style="left:735px;top:645px;width:145px;color:#D4537E;" contenteditable="true">CEGUERA<br>COLECTIVA</div>
+
+  <div class="sub-label" style="left:900px;top:560px;color:#D4537E;background:#FBEAF0;border-color:#ED93B1;" contenteditable="true">Ver todo y no actuar</div>
+  <div class="sub-label" style="left:910px;top:655px;color:#D4537E;background:#FBEAF0;border-color:#ED93B1;" contenteditable="true">Pacto tácito de silencio</div>
+  <div class="leaf" style="left:715px;top:750px;border-color:#ED93B1;color:#72243E;max-width:180px;" contenteditable="true">Caso Epstein (2019-2024) confirmó las redes que Kubrick retrató en 1999</div>
+
+  <div class="icon-dot" style="left:262px;top:602px;background:#C47A12;">$</div>
+  <div class="branch-label" style="left:190px;top:645px;width:185px;color:#C47A12;" contenteditable="true">MERCANTILIZACIÓN<br>DE PERSONAS</div>
+
+  <div class="sub-label" style="left:15px;top:560px;color:#C47A12;background:#FAEEDA;border-color:#EF9F27;" contenteditable="true">Personas tratadas como objetos</div>
+  <div class="sub-label" style="left:10px;top:655px;color:#C47A12;background:#FAEEDA;border-color:#EF9F27;" contenteditable="true">Solo importa el valor de uso</div>
+  <div class="leaf" style="left:200px;top:750px;border-color:#EF9F27;color:#633806;max-width:180px;" contenteditable="true">CEPAL 2025: desigualdad de género persiste y limita la autonomía de las mujeres en América Latina</div>
+
+  <div class="icon-dot" style="left:202px;top:392px;background:#2573C5;">E</div>
+  <div class="branch-label" style="left:152px;top:435px;width:140px;color:#2573C5;" contenteditable="true">EROSIÓN<br>DEMOCRÁTICA</div>
+
+  <div class="sub-label" style="left:15px;top:345px;color:#2573C5;background:#E6F1FB;border-color:#85B7EB;" contenteditable="true">La ley no aplica a la élite</div>
+  <div class="sub-label" style="left:15px;top:450px;color:#2573C5;background:#E6F1FB;border-color:#85B7EB;" contenteditable="true">Poder opera al margen</div>
+  <div class="leaf" style="left:15px;top:385px;border-color:#85B7EB;color:#0C447C;max-width:145px;" contenteditable="true">América Latina 2026: polarización y concentración del ejecutivo (FIU)</div>
+
+</div>
+
+<div class="sources">
+  <div class="sources-title">Fuentes de información</div>
+  <div class="sources-list" contenteditable="true">
+    <span><b>[1]</b> Oxfam México (23 feb. 2026). "Oligarquía o democracia". <a href="https://oxfam.mx/boletin-oligarquia-o-democracia/" target="_blank">oxfam.mx</a></span>
+    <span><b>[2]</b> World Inequality Lab (nov. 2025). Informe Mundial sobre la Desigualdad 2026. <a href="https://wir2026.wid.world" target="_blank">wir2026.wid.world</a></span>
+    <span><b>[3]</b> CEPAL (2025). Panorama Social de América Latina y el Caribe. <a href="https://www.cepal.org/es/publicaciones/84175-panorama-social-america-latina-caribe-2025-como-salir-la-trampa-alta-desigualdad" target="_blank">cepal.org</a></span>
+    <span><b>[4]</b> Florida International University (2025). Latin America Country Risk Index. <a href="https://www.negociosmagazine.com/america-latina-en-2026-una-region-entre-el-riesgo-la-reforma-y-la-oportunidad/" target="_blank">negociosmagazine.com</a></span>
+    <span><b>[5]</b> Newz.com (abr. 2026). "Elecciones peruanas 2026". <a href="https://es.newz.com/elecciones-peruanas-2026-entre-la-dispersion-partidaria-y-el-poder-de-las-redes/" target="_blank">es.newz.com</a></span>
+    <span><b>[6]</b> Taher, N. (feb. 2026). "Eyes Wide Shut: cuando la sociedad ve todo y elige nada". <a href="https://medium.com/@nicoletaher/eyes-wide-shut-is-what-it-looks-like-when-a-society-sees-everything-and-chooses-nothing-8d8f2deda51c" target="_blank">medium.com</a></span>
+    <span><b>[7]</b> Mexico Social (ene. 2026). Informe de Desigualdad 2026. <a href="https://www.mexicosocial.org/la-desigualdad-no-es-el-destino-sino-una-eleccion/" target="_blank">mexicosocial.org</a></span>
+    <span><b>[8]</b> POPLab (feb. 2026). "Contra el imperio de los más ricos". <a href="https://poplab.mx/posts/contra-el-imperio-de-los-mas-ricos-y-las-desigualdades/" target="_blank">poplab.mx</a></span>
+  </div>
+</div>
+</div>
+
+<script>
+async function exportPDF(){
+  const btn = document.getElementById('exportBtn');
+  btn.classList.add('loading');
+  btn.textContent = 'Generando PDF...';
+
+  try {
+    const el = document.getElementById('mapContent');
+    // Aumentamos la escala para mejor calidad de impresión
+    const canvas = await html2canvas(el, {
+      scale: 2, 
+      useCORS: true,
+      backgroundColor: '#FDF9F0',
+      logging: false
+    });
+
+    const { jsPDF } = window.jspdf;
+    // Orientación horizontal (landscape), unidades en mm, tamaño A4
+    const pdf = new jsPDF('l', 'mm', 'a4');
+    
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = pdf.internal.pageSize.getHeight();
+    
+    // Calculamos proporciones para que quepa en una sola hoja
+    const imgProps = pdf.getImageProperties(canvas.toDataURL('image/jpeg', 1.0));
+    const ratio = Math.min(pdfW / imgProps.width, pdfH / imgProps.height);
+    
+    const width = imgProps.width * ratio;
+    const height = imgProps.height * ratio;
+    
+    // Centramos la imagen en la página
+    const x = (pdfW - width) / 2;
+    const y = (pdfH - height) / 2;
+
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', x, y, width, height);
+    pdf.save('Mapa_Mental_Ojos_Bien_Cerrados.pdf');
+
+  } catch (e) {
+    console.error(e);
+    alert('Error al generar PDF');
+  }
+  
+  btn.classList.remove('loading');
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Exportar PDF';
+}
+</script>
+</body>
+</html>
